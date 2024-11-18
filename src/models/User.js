@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Check if model already exists before defining
+// Check if the model already exists before defining
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     name: {
         type: String,

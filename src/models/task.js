@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Define the Task schema
 const taskSchema = new mongoose.Schema({
     taskName: {  // Renamed from 'title' to 'taskName'
         type: String,
@@ -34,9 +35,10 @@ const taskSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['on progress', 'dev done', 'completed'],  // Updated status values
-        default: 'on progress'
+        enum: ['In progress', 'dev done', 'complete', 'To Do'],  // Updated status values
+        default: 'To DO'
     }
 }, { timestamps: true });
 
+// Export the Task model
 module.exports = mongoose.model('Task', taskSchema);
