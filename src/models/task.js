@@ -1,11 +1,19 @@
 import { Schema, model } from "mongoose";
 
+<<<<<<< HEAD
 const taskSchema = new Schema(
   {
     taskName: {
       // Renamed from 'title' to 'taskName'
       type: String,
       required: true,
+=======
+// Define the Task schema
+const taskSchema = new mongoose.Schema({
+    taskName: {  // Renamed from 'title' to 'taskName'
+        type: String,
+        required: true
+>>>>>>> 3b975c2d50f22ea28a0d44643a64f25760fe1d0a
     },
     description: {
       type: String,
@@ -36,6 +44,7 @@ const taskSchema = new Schema(
       required: true,
     },
     status: {
+<<<<<<< HEAD
       type: String,
       enum: ["on progress", "dev done", "completed"], // Updated status values
       default: "on progress",
@@ -45,3 +54,13 @@ const taskSchema = new Schema(
 );
 
 export default model("Task", taskSchema);
+=======
+        type: String,
+        enum: ['In progress', 'dev done', 'complete', 'To Do'],  // Updated status values
+        default: 'To DO'
+    }
+}, { timestamps: true });
+
+// Export the Task model
+module.exports = mongoose.model('Task', taskSchema);
+>>>>>>> 3b975c2d50f22ea28a0d44643a64f25760fe1d0a
