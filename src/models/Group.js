@@ -1,30 +1,27 @@
-import { findById } from "./models/Group"; // Assuming Group model is in models/Group.js
+import mongoose from "mongoose";
 
-// Function to get group details with tasks
-async function getGroupWithTasks(groupId) {
-  try {
-    const group = await findById(groupId)
-      .populate("tasks") // Populate the tasks field to get full task details
-      .exec();
-
-    if (!group) {
-      console.log("Group not found");
-      return null;
-    }
-
-    // Return an object with Group ID, Group Name, and Tasks
-    return {
-      groupId: group._id,
-      groupName: group.name,
-      tasks: group.tasks, // This will contain the populated task objects
-    };
-  } catch (error) {
-    console.error("Error fetching group:", error);
-    throw error;
+const groupSchema = new mongoose.Schema(
+  {
+    groupId: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    tasks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Task",
+      },
+    ],
+  },
+  {
+    timestamps: true,
   }
-}
+);
 
-// Example usage
-getGroupWithTasks("64f1a8b2c8e4f0a2a9b0c123").then((group) => {
-  console.log(group); // This will print the group object with tasks
-});
+const Group = mongoose.model("Group", groupSchema);
+
+export default Group;

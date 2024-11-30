@@ -1,65 +1,71 @@
-import { models, model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
+import bcrypt from "bcryptjs";
 
-<<<<<<< HEAD
-// Check if model already exists before defining
-const User =
-  models.User ||
-  model(
-    "User",
-    new Schema(
-      {
-        name: {
-          type: String,
-          required: true,
-        },
-        phoneNumber: {
-          type: String,
-          required: true,
-          validate: {
-            validator: function (v) {
-              return /\d{10}/.test(v); // Basic validation for 10-digit phone numbers
-=======
-// Check if the model already exists before defining
-const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
+const userSchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: [true, "Name is required"],
+      trim: true,
     },
     phoneNumber: {
-        type: String,
-        required: true,
-        validate: {
-            validator: function(v) {
-                return /\d{10}/.test(v);  // Basic validation for 10-digit phone numbers
->>>>>>> 3b975c2d50f22ea28a0d44643a64f25760fe1d0a
-            },
-            message: (props) => `${props.value} is not a valid phone number!`,
-          },
+      type: String,
+      required: [true, "Phone number is required"],
+      validate: {
+        validator: function (v) {
+          return /\d{10}/.test(v);
         },
-        gmail: {
-          type: String,
-          required: true,
-          unique: true,
-          validate: {
-            validator: function (v) {
-              return /^([\w.%+-]+)@gmail\.com$/i.test(v); // Validation to ensure it's a Gmail address
-            },
-            message: (props) => `${props.value} is not a valid Gmail address!`,
-          },
-        },
-        password: {
-          type: String,
-          required: true,
-        },
-        tasks: [
-          {
-            type: Schema.Types.ObjectId,
-            ref: "Task", // Reference to the Task model
-          },
-        ],
+        message: (props) => `${props.value} is not a valid phone number!`,
       },
-      { timestamps: true }
-    )
-  );
+    },
+    gmail: {
+      type: String,
+      required: [true, "Gmail is required"],
+      unique: true,
+      lowercase: true,
+      validate: {
+        validator: function (v) {
+          return /^([\w.%+-]+)@gmail\.com$/i.test(v);
+        },
+        message: (props) => `${props.value} is not a valid Gmail address!`,
+      },
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters"],
+    },
+    tasks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Task",
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
+// Pre-save middleware to hash password
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Method to compare password for login
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Method to get user data without sensitive information
+userSchema.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.password;
+  return userObject;
+};
+
+const User = model("User", userSchema);
 
 export default User;
