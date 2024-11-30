@@ -12,8 +12,9 @@ export const registerUser = async (req, res) => {
         .status(400)
         .json({ message: "User already exists with this Gmail" });
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(password);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = await User.create({
       name,

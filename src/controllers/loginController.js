@@ -1,35 +1,30 @@
 import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
-export const loginAuth = async (req, res) => {
+export const loginUser = async (req, res) => {
   const { gmail, password } = req.body;
 
   try {
-    const user = await User.findOne({ gmail: gmail });
-    console.log("Found user:", user);
-
+    const user = await User.findOne({ gmail });
+    console.log(user);
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    console.log("Stored hashed password:", user.password);
-    console.log("Password being compared:", password);
-
-    // Compare password using bcrypt
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log("Password valid:", isPasswordValid);
-
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, gmail: user.gmail },
+      { userId: user._id, gmail: user.gmail, role: "user" },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
+    // Send successful response
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -41,7 +36,7 @@ export const loginAuth = async (req, res) => {
       token,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       message: "Login failed",
       error: error.message,
     });

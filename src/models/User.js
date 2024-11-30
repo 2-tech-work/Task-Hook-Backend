@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import bcrypt from "bcryptjs";
+import bcryptjs from "bcryptjs"; // Ensure consistent import
 
 const userSchema = new Schema(
   {
@@ -45,18 +45,28 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-// Pre-save middleware to hash password
+// Update the password hashing pre-save middleware
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  try {
+    const salt = await bcryptjs.genSalt(10);
+    this.password = await bcryptjs.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-// Method to compare password for login
+// Update the password comparison method
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  try {
+    // Direct comparison using bcryptjs
+    const isMatch = await bcryptjs.compare(candidatePassword, this.password);
+    return isMatch;
+  } catch (error) {
+    throw new Error("Password comparison failed");
+  }
 };
 
 // Method to get user data without sensitive information
