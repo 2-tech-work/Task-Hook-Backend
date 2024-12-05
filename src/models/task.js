@@ -2,6 +2,10 @@ import { Schema, model } from "mongoose";
 
 const taskSchema = new Schema(
   {
+    taskId: {
+      type: String,
+      required: true,
+    },
     taskName: {
       type: String,
       required: true,
