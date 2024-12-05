@@ -1,4 +1,5 @@
 import Task from "../models/task.js";
+import { v4 as uuidv4 } from "uuid";
 
 export const getTask = async (req, res) => {
   const tasks = await Task.find();
@@ -27,14 +28,15 @@ export const createTask = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 export const eachTask = async (req, res) => {
   const { id } = req.params;
   try {
-    const tasks = await Task.findById(id);
-    if (!tasks) {
-      return res.status(400).json({ message: "Task Not Found" });
+    const task = await Task.findOne({ taskId: id });
+    if (!task) {
+      return res.status(404).json({ message: "Task Not Found" });
     }
-    res.status(200).json(tasks);
+    res.status(200).json(task);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -45,8 +47,8 @@ export const updateTask = async (req, res) => {
   const { taskName, description, priority, startDate, endDate, status } =
     req.body;
   try {
-    const task = await Task.findByIdAndUpdate(
-      id,
+    const task = await Task.findOneAndUpdate(
+      { taskId: id },
       {
         taskName,
         description,
@@ -58,10 +60,10 @@ export const updateTask = async (req, res) => {
       { new: true }
     );
     if (!task) {
-      return res.status(400).json({ message: "Task not found" });
+      return res.status(404).json({ message: "Task not found" });
     }
-    res.status(200).json({ message: "Task Updated Succesfully" });
-  } catch (e) {
+    res.status(200).json({ message: "Task Updated Successfully", task });
+  } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
@@ -69,11 +71,11 @@ export const updateTask = async (req, res) => {
 export const deleteTask = async (req, res) => {
   const { id } = req.params;
   try {
-    const task = await Task.findByIdAndDelete(id);
+    const task = await Task.findOneAndDelete({ taskId: id });
     if (!task) {
-      return res.status(400).json({ message: "Task not found" });
+      return res.status(404).json({ message: "Task not found" });
     }
-    res.status(200).json({ message: "Task deleted successfuly" });
+    res.status(200).json({ message: "Task deleted successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

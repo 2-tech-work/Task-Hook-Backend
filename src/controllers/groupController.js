@@ -23,10 +23,11 @@ export const createGroup = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 export const eachGroup = async (req, res) => {
   const { id } = req.params;
   try {
-    const group = await Group.findById(id);
+    const group = await Group.findOne({ groupId: id });
     if (!group) {
       return res.status(400).json({ message: "Group Not Found" });
     }
@@ -40,8 +41,8 @@ export const updateGroup = async (req, res) => {
   const { id } = req.params;
   const { name, description } = req.body;
   try {
-    const group = await Group.findByIdAndUpdate(
-      id,
+    const group = await Group.findOneAndUpdate(
+      { groupId: id },
       {
         name,
         description,
@@ -60,7 +61,7 @@ export const updateGroup = async (req, res) => {
 export const deleteGroup = async (req, res) => {
   const { id } = req.params;
   try {
-    const group = await Group.findByIdAndDelete(id);
+    const group = await Group.findOneAndDelete({ groupId: id });
     if (!group) {
       return res.status(400).json({ message: "Group not found" });
     }
