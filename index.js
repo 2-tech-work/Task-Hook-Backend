@@ -10,6 +10,8 @@ import group from "./src/routes/groupRoute.js";
 import login from "./src/routes/loginRoute.js";
 import register from "./src/routes/registerUser.js";
 import authMiddleware from "./src/middlewares/authMiddleware.js";
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 
 // Swagger configuration
@@ -50,6 +52,7 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 const swaggerUiOptions = {
   swaggerOptions: {
+    persistAuthorization: true,
     authAction: {
       JWT: {
         name: "JWT",
@@ -57,14 +60,13 @@ const swaggerUiOptions = {
           type: "apiKey",
           in: "header",
           name: "Authorization",
-          description: "",
+          description: "Bearer token authorization",
         },
-        value: "Bearer <JWT>",
+        value: "Bearer ",
       },
     },
   },
 };
-
 app.use(
   "/api-docs",
   swaggerUi.serve,
@@ -90,6 +92,3 @@ app.listen(5000, async () => {
     `Swagger documentation available at http://localhost:5000/api-docs`
   );
 });
-
-import dotenv from "dotenv";
-dotenv.config();

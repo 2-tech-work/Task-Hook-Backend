@@ -9,18 +9,24 @@ export const createTask = async (req, res) => {
   const { taskName, description, priority, startDate, endDate, status } =
     req.body;
   try {
+    const taskId = `TK-${uuidv4().slice(0, 8)}`;
+
     const newTask = await Task.create({
-      taskName: taskName,
-      description: description,
-      priority: priority,
-      status: status,
+      taskId,
+      taskName,
+      description,
+      priority,
+      status,
+      startDate,
+      endDate,
     });
-    res.status(200).json({ message: "Task Created Sucessfully" });
+    res
+      .status(200)
+      .json({ message: "Task Created Successfully", task: newTask });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
-
 export const eachTask = async (req, res) => {
   const { id } = req.params;
   try {
