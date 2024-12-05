@@ -6,7 +6,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/register:
+ * /api/auth/register:
  *   post:
  *     summary: Register new user
  *     tags: [Auth]
@@ -29,6 +29,6 @@ const router = express.Router();
  *       400:
  *         description: Registration failed
  */
-router.post("/register", registerUser);
+router.post("/", registerUser);
 
 export default router;

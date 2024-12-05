@@ -2,13 +2,13 @@ import express from "express";
 import { loginUser } from "../controllers/loginController.js";
 
 const router = express.Router();
-router.post("/login", loginUser);
+router.post("/", loginUser);
 
 export default router;
 
 /**
  * @swagger
- * /api/login:
+ * /api/auth/login:
  *   post:
  *     summary: Login user
  *     tags: [Auth]
@@ -19,7 +19,7 @@ export default router;
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               gmail:
  *                 type: string
  *               password:
  *                 type: string

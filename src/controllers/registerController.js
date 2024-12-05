@@ -1,7 +1,6 @@
 import User from "../models/User.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import bcrypt from "bcryptjs";
 export const registerUser = async (req, res) => {
   const { name, phoneNumber, gmail, password } = req.body;
 
@@ -12,16 +11,16 @@ export const registerUser = async (req, res) => {
         .status(400)
         .json({ message: "User already exists with this Gmail" });
     }
-    console.log(password);
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const hashingPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
       name,
       phoneNumber,
       gmail,
-      password: hashedPassword,
+      password: hashingPassword,
     });
+
     const token = jwt.sign(
       { userId: newUser._id, gmail: newUser.gmail, role: "user" },
       process.env.JWT_SECRET,

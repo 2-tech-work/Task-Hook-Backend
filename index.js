@@ -6,9 +6,10 @@ import swaggerUi from "swagger-ui-express";
 import { connectDB } from "./src/config/database.js";
 import task from "./src/routes/taskRoute.js";
 import group from "./src/routes/groupRoute.js";
-import userRegistration from "./src/routes/registerUser.js";
-import loginRoute from "./src/routes/loginRoute.js";
 
+import login from "./src/routes/loginRoute.js";
+import register from "./src/routes/registerUser.js";
+import authMiddleware from "./src/middlewares/authMiddleware.js";
 const app = express();
 
 // Swagger configuration
@@ -75,11 +76,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/auth", loginRoute);
+
 app.get("/", (req, res) => res.send("Task Hook Backend Home Route"));
-app.use("/api/tasks", task);
-app.use("/api/groups", group);
-app.use("/api/auth", userRegistration);
+app.use("/api/tasks", authMiddleware, task);
+app.use("/api/groups", authMiddleware, group);
+app.use("/api/auth/login", login);
+app.use("/api/auth/register", register);
 
 app.listen(5000, async () => {
   await connectDB();

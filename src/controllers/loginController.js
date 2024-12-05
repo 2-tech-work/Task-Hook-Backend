@@ -1,48 +1,33 @@
 import User from "../models/User.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 export const loginUser = async (req, res) => {
   const { gmail, password } = req.body;
 
-  // Input validation
   if (!gmail || !password) {
     return res.status(400).json({
       success: false,
-      message: "Email and password are required",
+      message: "Gmail and password are required",
     });
   }
 
   try {
-    // Debug log
-    console.log("Login attempt for:", gmail);
-
     const user = await User.findOne({ gmail: gmail.trim().toLowerCase() });
-
-    // Debug log
-    console.log("User found:", user ? "Yes" : "No");
 
     if (!user) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
-        debug: "User not found",
       });
     }
 
-    // Debug password comparison
-    console.log("Comparing passwords...");
-    const isPasswordValid = await bcrypt.compare(
-      String(password),
-      user.password
-    );
-    console.log("Password valid:", isPasswordValid);
-
-    if (!isPasswordValid) {
+    // Direct password comparison
+    const decryptedPassword = await bcrypt.compare(password, user.password);
+    if (!decryptedPassword) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
-        debug: "Password mismatch",
       });
     }
 
@@ -57,9 +42,6 @@ export const loginUser = async (req, res) => {
       { expiresIn: "24h" }
     );
 
-    // Debug log
-    console.log("Token generated successfully");
-
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -73,17 +55,10 @@ export const loginUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error("Detailed login error:", {
-      message: error.message,
-      stack: error.stack,
-    });
-
     res.status(500).json({
       success: false,
       message: "Login failed",
       error: error.message,
-      errorDetails:
-        process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
   }
 };
