@@ -1,6 +1,6 @@
 import Group from "../models/group.js";
 import { v4 as uuidv4 } from "uuid";
-
+import User from "../models/User.js";
 export const getGroups = async (req, res) => {
   const groups = await Group.find();
   res.send(groups);
@@ -16,9 +16,21 @@ export const createGroup = async (req, res) => {
       name,
       tasks,
     });
-    res
-      .status(200)
-      .json({ message: "Group Created Successfully", group: newGroup });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.userId,
+      { $push: { groups: groupId } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Group Created Successfully",
+      group: newGroup,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

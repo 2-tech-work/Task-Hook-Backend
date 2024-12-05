@@ -1,6 +1,6 @@
 import Task from "../models/task.js";
 import { v4 as uuidv4 } from "uuid";
-
+import User from "../models/User.js";
 export const getTask = async (req, res) => {
   const tasks = await Task.find();
   res.send(tasks);
@@ -21,9 +21,22 @@ export const createTask = async (req, res) => {
       startDate,
       endDate,
     });
-    res
-      .status(200)
-      .json({ message: "Task Created Successfully", task: newTask });
+
+    // The JWT token contains userId which is MongoDB _id
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.userId,
+      { $push: { tasks: taskId } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Task Created Successfully",
+      task: newTask,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

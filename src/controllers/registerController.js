@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 export const registerUser = async (req, res) => {
   const { name, phoneNumber, gmail, password } = req.body;
 
@@ -14,7 +15,9 @@ export const registerUser = async (req, res) => {
 
     const hashingPassword = await bcrypt.hash(password, 10);
 
+    const userId = `User-${uuidv4().slice(0, 8)}`;
     const newUser = await User.create({
+      userId,
       name,
       phoneNumber,
       gmail,
@@ -22,7 +25,7 @@ export const registerUser = async (req, res) => {
     });
 
     const token = jwt.sign(
-      { userId: newUser._id, gmail: newUser.gmail, role: "user" },
+      { userId: userId, gmail: newUser.gmail, role: "user" },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
