@@ -21,6 +21,7 @@ const taskSchema = new Schema(
     groupId: {
       type: Schema.Types.ObjectId,
       ref: "Group",
+      required: true,
     },
     priority: {
       type: String,
